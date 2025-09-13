@@ -1,0 +1,374 @@
+:root{
+  --yellow:#d8e507;
+  --ink:#0b1733;
+  --glass-bg:rgba(255,255,255,.18);
+  --glass-br:rgba(255,255,255,.45);
+  --radius:22px;
+  --shadow:0 12px 30px rgba(0,0,0,.25);
+  --section-pad:80px;
+
+  /* 導覽列高度（估 72px；若你實際高度不同可微調） */
+  --topbar-h:72px;
+}
+
+*{box-sizing:border-box}
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce){
+  html { scroll-behavior: auto; }
+}
+
+/* ===== 全域基礎 ===== */
+body{
+  margin:0;
+  color:#e6f0ff;
+  font-family:'Noto Sans TC', system-ui;
+  line-height:1.6;
+  background:#000; /* 備援底色 */
+  overflow-x:hidden;
+}
+
+/* ===== 固定背景層 ===== */
+.bg-fixed{
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-image:
+    linear-gradient(180deg, rgba(11,37,96,0) 0%, rgba(11,37,96,.4) 35%, rgba(11,37,96,.75) 100%),
+    url('img/背景.png');
+  background-blend-mode: overlay;
+  background-position: center top, center top;
+  background-size: auto, 100% auto;
+  background-repeat: no-repeat;
+}
+
+/* === 頂部黃色條（導覽列） === */
+.topbar{
+  position:sticky; top:0; z-index:60;
+  background: var(--yellow) url('img/上方工作欄.png') center/cover no-repeat;
+  border-bottom:1px solid rgba(0,0,0,.06);
+}
+.navwrap{max-width:1200px; margin:0 auto; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; padding:10px 16px;}
+.brand{display:flex; align-items:center; gap:12px; color:var(--ink); font-weight:900; letter-spacing:.02em}
+.brand b{font-family:'Noto Serif TC', serif; font-size:18px}
+
+.topbar-banner{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:6px 0 10px;
+}
+.topbar-banner img{
+  width: min(1100px, 94vw);
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,.12));
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ===== 導覽按鈕：白色玻璃膠囊風格 ===== */
+.nav{
+  display: flex;
+  gap: 18px;                   /* 與舊值不同：拉開間距更呼吸 */
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+}
+.nav a{
+  position: relative;
+  padding: 10px 4px;          /* 僅保留上下內距，視覺更清爽 */
+  font-weight: 900;
+  letter-spacing: .01em;
+  color: var(--ink);
+  text-decoration: none;
+
+  /* 強制蓋掉舊樣式 */
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  border-radius: 0 !important;
+
+  transition: color .2s ease;
+}
+.nav a::after{
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -6px;  /* 與頂欄底線錯開，視覺更穩 */
+  height: 2px;
+  background: currentColor;
+  opacity: 0;
+  transform: scaleX(.25);
+  transform-origin: left;
+  transition: transform .25s ease, opacity .25s ease;
+}
+.nav a:hover::after{
+  opacity: .9;
+  transform: scaleX(1);
+}
+
+.nav a:hover{
+  transform:translateY(-1px);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.9) inset,
+    0 12px 28px rgba(0,0,0,.12);
+}
+.nav a:active{
+  transform:none;
+  box-shadow:
+    0 0 0 rgba(0,0,0,0),
+    0 6px 14px rgba(0,0,0,.12) inset;
+}
+.nav a:focus-visible{
+  outline:none;
+  border-color:#6499e9;
+  box-shadow:
+    0 0 0 3px rgba(100,153,233,.35),
+    0 8px 20px rgba(0,0,0,.12);
+}
+.nav a.active{
+  color: #0b1733;             /* 更深一階，增加層次 */
+}
+.nav a.active::after{
+  opacity: 1;
+  height: 3px;
+  border-radius: 2px;
+  transform: none;
+  background: linear-gradient(90deg, #0b1733, #8ad0ff, #d8e507);
+}
+
+/* 無障礙：鍵盤聚焦時明顯但不花俏 */
+.nav a:focus-visible{
+  outline: 2px solid rgba(11,23,51,.35);
+  outline-offset: 4px;
+}
+@media (max-width: 860px){
+  .nav{ justify-content: center; row-gap: 6px; }
+}
+
+/* === 首屏（主視覺）— 改為直向排版，避免重疊 === */
+.hero{
+  position: relative;
+  min-height: 100vh;
+  display: flex;                 /* 原本 grid -> flex column */
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  overflow: hidden;
+  background: transparent;
+  z-index: 0;
+
+  /* 給足上下呼吸，任何寬度都不會截到主題圖或按鈕 */
+  padding-top: clamp(80px, 12vh, 140px);
+  padding-bottom: clamp(40px, 8vh, 100px);
+}
+
+/* 漸層遮罩（位於最下層；主題圖與按鈕在上層） */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events:none;
+  background: linear-gradient(
+    180deg,
+    rgba(4, 12, 28, 0) 0%,
+    rgba(4, 12, 28, .25) 20%,
+    rgba(4, 12, 28, .55) 40%,
+    rgba(4, 12, 28, .9) 100%
+  );
+}
+
+/* 主視覺標題圖：移除負邊距，與按鈕自然排列 */
+.title-mark{
+  position: relative;
+  z-index: 2;
+  width: min(1100px, 94vw);
+  height: auto;
+  display: block;
+  margin: 0 auto clamp(14px, 2.4vh, 28px);  /* 與下方按鈕的距離 */
+  filter: drop-shadow(0 14px 30px rgba(0,0,0,.35));
+  transform: none;
+}
+.hero-inner{
+  position: relative;
+  z-index: 2;
+  max-width: 1100px;
+  width: 100%;
+  padding: 0 16px 60px;
+  margin-top: clamp(16px, 2.2vh, 24px);
+}
+
+/* 展開探索按鈕：撤銷舊的負 margin，固定在主題圖下方 */
+.scroll-btn{
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+  margin: clamp(8px, 1.6vh, 18px) auto 0; /* 取代原來的 -600px */
+  padding: 12px 28px;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  color: #e6f0ff;
+  text-decoration: none;
+  border-radius: 999px;
+  background:
+    radial-gradient(120px 40px at 20% 50%, rgba(255,255,255,.28), rgba(255,255,255,0) 70%) no-repeat,
+    linear-gradient(90deg, #d8e507, #8ad0ff , #d8e507) 0/200% 100%;
+  border: 1px solid rgba(255,255,255,.45);
+  backdrop-filter: blur(6px);
+  box-shadow:
+    0 0 10px rgba(120,220,255,.55),
+    0 0 20px rgba(120,220,255,.35);
+  transition: transform .18s ease, box-shadow .18s ease, background-position .8s ease;
+  overflow: visible;
+  animation: ribbonShift 4s linear infinite, glowBreath 2.2s ease-in-out infinite;
+}
+.scroll-btn:hover{
+  transform: translateY(-2px) scale(1.06);
+  box-shadow:
+    0 0 14px #d8e507,
+    0 0 28px #8ad0ff;
+  background-position: 100% 0;
+}
+.scroll-btn:focus-visible{
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(255,255,255,.65),
+    0 0 24px rgba(160,140,255,.65);
+}
+.scroll-btn::before{
+  content:"";
+  position:absolute; inset:-12px -16px;
+  border-radius: inherit;
+  background:
+    radial-gradient(60% 120% at 50% -10%, #d8e507, transparent 60%),
+    radial-gradient(80% 60%  at 90% 50%, #8ad0ff , transparent 70%),
+    radial-gradient(70% 80%  at 10% 60%, #d8e507, transparent 70%);
+  filter: blur(10px);
+  opacity:.9;
+  z-index:-1;
+  animation: auroraFloat 6s ease-in-out infinite;
+}
+.scroll-btn::after{
+  content:"";
+  position:absolute; inset:0;
+  border-radius: inherit;
+  padding:1px;
+  background: linear-gradient(90deg, #d8e507,#8ad0ff ,  #d8e507) 0/200% 100%;
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  animation: borderShift 4s linear infinite;
+}
+
+/* 小螢幕額外空間，避免緊貼 */
+@media (max-width: 600px){
+  .hero{
+    padding-top: clamp(96px, 16vh, 160px);
+    padding-bottom: clamp(48px, 8vh, 96px);
+  }
+  .title-mark{
+    width: min(1000px, 92vw);
+    margin-bottom: clamp(18px, 3vh, 24px);
+  }
+}
+
+/* 系所按鈕區 */
+.dept-grid{display:grid; grid-template-columns:repeat(2,minmax(220px,1fr)); gap:18px; max-width:860px; margin:0 auto }
+.dept-img{width:100%; height:auto; display:block}
+.dept-link{display:block; transition:.2s ease}
+.dept-link:hover{transform:translateY(-2px) scale(1.03)}
+.dept-grid .dept-link:nth-child(2) { margin-top: 13px; }
+
+/* === 區塊樣式 === */
+section{scroll-margin-top:140px;}
+.section{max-width:1100px; margin:100px auto; padding:var(--section-pad) 16px;}
+.glass{
+  background:var(--glass-bg); border:1px solid var(--glass-br);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  backdrop-filter:blur(14px) saturate(130%);
+  padding:28px; color:#e9f3ff;
+}
+.section h2{margin:0 0 12px; font-family:'Noto Serif TC',serif; font-size:32px}
+.muted{opacity:.9; margin-top:0}
+
+/* FAQ */
+.faq{display:grid; gap:12px}
+details{border:1px solid rgba(255,255,255,.35); border-radius:14px; background:rgba(255,255,255,.06)}
+summary{cursor:pointer; padding:16px 18px; font-weight:700}
+details[open]{background:rgba(255,255,255,.10)}
+details .a{padding:0 18px 18px; opacity:.95}
+
+/* 交通資訊 */
+.info-grid{display:grid; grid-template-columns:1.2fr .8fr; gap:18px}
+.kv{display:grid; gap:10px}
+.kv b{font-size:18px}
+.kv div{background:rgba(255,255,255,.06); padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.25)}
+iframe.map{width:100%; height:340px; border:0; border-radius:14px; filter:grayscale(.1) contrast(1.1)}
+
+/* 贊助廠商 */
+.sponsor-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px}
+.sponsor{height:96px; border-radius:14px; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); display:grid; place-items:center; font-weight:800; color:#0b1733; text-shadow:0 1px 0 #fff8}
+
+/* IG */
+.ig-wrap{display:grid; gap:12px}
+.ig-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px}
+.ig{aspect-ratio:1/1; border-radius:14px; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35)}
+
+/* 底部 */
+footer{padding:40px 16px 80px; text-align:center; opacity:.8}
+
+/* RWD 背景縮放 */
+@media (max-width: 1024px){
+  .bg-fixed{ background-size: 120% auto, 120% auto; }
+}
+@media (max-width: 768px){
+  .bg-fixed{ background-size: 120% auto, 150% auto; }
+}
+
+/* Sticky 漸層（full-bleed；鋪滿整個視窗寬） */
+.section-fade{
+  position: sticky;
+  top: 0;
+  height: 40vh;                 /* 想更長就調這裡 */
+  margin-top: -24vh;            /* 與 height 同值，從段落頂端就覆蓋 */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  pointer-events: none;
+  z-index: 5;
+  background: linear-gradient(
+    180deg,
+    rgba(4, 12, 28, .90) 0%,
+    rgba(4, 12, 28, .55) 40%,
+    rgba(4, 12, 28, .25) 70%,
+    rgba(4, 12, 28, 0) 100%
+  );
+  will-change: transform;
+}
+@media (max-width: 768px){
+  .section-fade{
+    height: 30vh;
+    margin-top: -30vh;
+  }
+}
+
+/* 按鈕動畫 keyframes（保留你原來的） */
+@keyframes ribbonShift{ 0%{background-position:0% 0} 100%{background-position:200% 0} }
+@keyframes borderShift{ 0%{background-position:0% 0} 100%{background-position:200% 0} }
+@keyframes glowBreath{
+  0%,100%{ box-shadow:0 0 10px rgba(120,220,255,.55), 0 0 20px rgba(120,220,255,.35) }
+  50%{    box-shadow:0 0 16px rgba(160,200,255,.85), 0 0 32px rgba(190,160,255,.55) }
+}
+@keyframes auroraFloat{
+  0%,100%{ transform: translateY(0) scale(1); opacity:.9 }
+  50%{    transform: translateY(2px) scale(1.02); opacity:1 }
+}
+
+/* 使用者偏好：降低動畫 */
+@media (prefers-reduced-motion: reduce){
+  .scroll-btn, .scroll-btn::before, .scroll-btn::after{
+    animation:none; transition:none;
+  }
+}
