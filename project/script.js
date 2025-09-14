@@ -52,3 +52,36 @@ function scrollToDept(e){
     if (history.pushState) history.pushState(null, '', '#dept');
   };
 })();
+
+/* 背景「首段平移」：在前 70vh 的捲動，把背景從 0% 補間到 100% */
+(function () {
+  const root = document.documentElement;
+  const prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // 在多少視窗高度內完成平移：60~80 之間都可，70vh 比較自然
+  const PAN_DISTANCE_VH = 70;
+
+  let ticking = false;
+
+  function update() {
+    const max = window.innerHeight * (PAN_DISTANCE_VH / 100);
+    // 只在頁面頂端的前 max 區間內做平移，之後就固定在 100%
+    const y = Math.max(0, Math.min(window.scrollY, max));
+    const t = max ? (y / max) : 0;          // 0 ~ 1
+    const pos = Math.round(t * 100);        // 0% ~ 100%
+    root.style.setProperty('--bg-pos', pos + '%');
+    ticking = false;
+  }
+
+  function onScroll() {
+    if (prefersReduce) return;              // 尊重「降低動效」
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', update);
+  update(); // 初始設為 0%
+})();
