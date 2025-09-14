@@ -1,386 +1,154 @@
-/* ------------------------------
-   1) 全域變數（可調參數都放這裡）
---------------------------------*/
-:root{
-  --yellow:#d8e507;
-  --ink:#0b1733;
-  --glass-bg:rgba(255,255,255,.18);
-  --glass-br:rgba(255,255,255,.45);
-  --radius:22px;
-  --shadow:0 12px 30px rgba(0,0,0,.25);
-  --section-pad:80px;
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>115級畢業聯展｜Be Continued × Tech Odyssey</title>
+  <meta name="description" content="國立臺灣師範大學 國文傳播學系 × 科技應用與人力資源發展學系 115級畢業聯展" />
 
-  /* Sticky 導覽列的高度（你現在大約 ~72px） */
-  --topbar-h:72px;
+  <!-- 字體 -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;900&family=Noto+Serif+TC:wght@600;700;900&display=swap" rel="stylesheet">
 
-  /* 🚀 首屏上移量：數值越大，首屏內容越靠上（避免主題圖被擠下） */
-  --hero-lift:10vh;
-}
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-/* 無障礙：全站平滑滾動；若使用者要求降低動效則關閉 */
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+  <!-- 固定背景層：整頁鋪滿，永不移動 -->
+  <div class="bg-fixed" aria-hidden="true"></div>
 
-/* ------------------------------
-   2) 全域基礎
---------------------------------*/
-body{
-  margin:0;
-  color:#e6f0ff;
-  font-family:'Noto Sans TC', system-ui;
-  line-height:1.6;
-  background:#000;         /* 背景備援色 */
-  overflow-x:hidden;       /* 防 100vw 等造成的橫向捲軸 */
-}
+  <!-- 導覽列 -->
+  <div class="topbar" id="top">
+    <div class="navwrap">
+      <div class="brand">
+        <b>115級畢業聯展｜Be Continued × Tech Odyssey</b>
+      </div>
+      <nav class="nav" id="nav">
+        <a href="#about">聯展介紹</a>
+        <a href="#faq">常見問題FAQ</a>
+        <a href="#traffic">交通資訊</a>
+        <a href="#floor">展場地圖</a>
+        <a href="#sponsor">贊助廠商</a>
+        <a href="#ig">聯展IG</a>
+      </nav>
+    </div>
+  </div>
 
-/* ------------------------------
-   3) 固定背景層（不跟著滾動）
---------------------------------*/
-.bg-fixed{
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  background-image:
-    linear-gradient(180deg, rgba(11,37,96,0) 0%, rgba(11,37,96,.4) 35%, rgba(11,37,96,.75) 100%),
-    url('img/背景.png');
-  background-blend-mode: overlay;
-  background-position: center top, center top;
-  background-size: auto, 100% auto;   /* 依寬鋪滿，不裁切 */
-  background-repeat: no-repeat;
-}
+  <div class="topbar-banner">
+    <img src="img/上方工作欄_文字.png" alt="聯展導覽文字裝飾" loading="lazy" />
+  </div>
 
-/* ------------------------------
-   4) 頂部導覽列（Sticky）
---------------------------------*/
-.topbar{
-  position:sticky; top:0; z-index:60;
-  background: var(--yellow) url('img/上方工作欄.png') center/cover no-repeat;
-  border-bottom:1px solid rgba(0,0,0,.06);
-}
-.navwrap{
-  max-width:1200px; margin:0 auto;
-  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
-  padding:10px 16px;
-}
-.brand{display:flex; align-items:center; gap:12px; color:var(--ink); font-weight:900; letter-spacing:.02em}
-.brand b{font-family:'Noto Serif TC', serif; font-size:18px}
+  <!-- 主視覺 -->
+  <header class="hero" id="home">
+    <img class="title-mark" src="img/中間主題.png" alt="聯展標題覆蓋圖" />
 
-.topbar-banner{
-  display:flex; justify-content:center; align-items:center; padding:6px 0 10px;
-}
-.topbar-banner img{
-  width:min(1100px, 94vw); height:auto; display:block;
-  filter:drop-shadow(0 2px 8px rgba(0,0,0,.12));
-  pointer-events:none; user-select:none;
-}
+    <!-- 展開探索按鈕 -->
+    <a href="#dept" class="scroll-btn" onclick="scrollToDept(event)">▼ 展開探索 ▼</a>
 
-/* ---- 導覽按鈕：極簡「底線分頁」風格 ---- */
-.nav{
-  display:flex; gap:18px; flex-wrap:wrap; align-items:center; justify-content:flex-start;
-}
-.nav a{
-  position:relative;
-  padding:10px 4px;                    /* 只保留上下內距 */
-  font-weight:900; letter-spacing:.01em;
-  color:var(--ink); text-decoration:none;
-  /* 把舊的膠囊/陰影/邊框全部關掉 */
-  background:none !important; border:0 !important; box-shadow:none !important; backdrop-filter:none !important; border-radius:0 !important;
-  transition:color .2s ease;
-}
-.nav a::after{                          /* 底線動畫 */
-  content:""; position:absolute; left:0; right:0; bottom:-6px; height:2px;
-  background:currentColor; opacity:0; transform:scaleX(.25); transform-origin:left;
-  transition:transform .25s ease, opacity .25s ease;
-}
-.nav a:hover::after{ opacity:.9; transform:scaleX(1); }
-.nav a.active{ color:#0b1733; }
-.nav a.active::after{                   /* 啟用：品牌漸層底線 */
-  opacity:1; height:3px; border-radius:2px; transform:none;
-  background:linear-gradient(90deg,#0b1733,#8ad0ff,#d8e507);
-}
-.nav a:focus-visible{ outline:2px solid rgba(11,23,51,.35); outline-offset:4px; }
-@media (max-width:860px){ .nav{ justify-content:center; row-gap:6px } }
+    <div class="hero-inner">
+      <div class="dept-grid" id="dept">
+        <a class="dept-link" href="#" target="_blank" rel="noopener">
+          <img class="dept-img" src="img/圖傳按鈕.png" alt="國文傳播學系 Be Continued" />
+        </a>
+        <a class="dept-link" href="#" target="_blank" rel="noopener">
+          <img class="dept-img" src="img/科技按鈕.png" alt="科技應用與人資發展學系 Tech Odyssey" />
+        </a>
+      </div>
+    </div>
+  </header>
 
-/* ------------------------------
-   5) 首屏（Hero）
-   重點：移除所有「負邊距」，用 --hero-lift 把版面整體上提；
-        限制主題圖的最大高度，保證一進場就完整可見。
---------------------------------*/
-.hero{
-  position:relative;
-  min-height: calc(100vh - var(--topbar-h)); /* 把頂欄高度扣掉，真正滿版 */
-  display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
-  text-align:center; overflow:hidden; background:transparent; z-index:0;
+  <!-- 聯展介紹 -->
+  <section id="about" class="section">
+    <!-- ✅ 黏住頂端的淡出漸層（承接 hero 的灰黑遮罩） -->
+    <div class="section-fade" aria-hidden="true"></div>
 
-  /* 上移：用 clamp 的基礎值減掉 --hero-lift（避免負值再墜落，包一層 max 保底） */
-  padding-top: max(24px, calc(clamp(80px, 12vh, 140px) - var(--hero-lift)));
-  padding-bottom: clamp(40px, 8vh, 100px);
-}
+    <div class="glass">
+      <h2>聯展介紹</h2>
+      <p class="muted">這裡撰寫展覽緣起、策展主題、指導單位、聯絡方式、開放時間等。</p>
+    </div>
+  </section>
 
-/* Hero 漸層（在最底層） */
-.hero::after{
-  content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
-  background:linear-gradient(180deg,
-    rgba(4,12,28,0) 0%,
-    rgba(4,12,28,.25) 28%,
-    rgba(4,12,28,.55) 58%,
-    rgba(4,12,28,.9) 100%);
-}
 
-/* 主題圖：不再用負邊距；限制最大高度，保證首屏完整顯示 */
-.title-mark{
-  position:relative; z-index:2;
-  width:min(1100px, 94vw); height:auto; display:block;
+  <!-- FAQ -->
+  <section id="faq" class="section">
+    <div class="glass">
+      <h2>常見問題 FAQ</h2>
+      <div class="faq">
+        <details>
+          <summary>展期與開放時段？</summary>
+          <div class="a">11/28（五）— 11/30（日），每日 10:00–18:00。</div>
+        </details>
+        <details>
+          <summary>是否需要購票或預約？</summary>
+          <div class="a">免費入場；人潮尖峰時段將實施流量控管。</div>
+        </details>
+        <details>
+          <summary>是否可攜帶飲食、是否有無障礙動線？</summary>
+          <div class="a">展場內請勿飲食；提供電梯與無障礙坡道。</div>
+        </details>
+      </div>
+    </div>
+  </section>
 
-  /* 關鍵：高度上限，避免圖片過高把下面內容擠出首屏 */
-  max-height: clamp(220px, 34vh, 420px);
+  <!-- 交通資訊 -->
+  <section id="traffic" class="section">
+    <div class="glass">
+      <h2>交通資訊</h2>
+      <div class="info-grid">
+        <div>
+          <iframe class="map" loading="lazy" allowfullscreen
+            src="https://www.google.com/maps/embed?...">
+          </iframe>
+        </div>
+        <div class="kv">
+          <div><b>時間</b><br>2025/11/28 — 11/30 10:00–18:00</div>
+          <div><b>地點</b><br>師大美術館 3F</div>
+          <div><b>交通方式</b><br>捷運、公車、停車資訊。</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  margin:0 auto clamp(14px, 2.4vh, 28px);
-  filter:drop-shadow(0 14px 30px rgba(0,0,0,.35));
-  transform:none;
-}
+  <!-- 展場地圖 -->
+  <section id="floor" class="section">
+    <div class="glass">
+      <h2>展場地圖</h2>
+      <div class="sponsor" style="height:260px;">在此放置展場平面圖</div>
+    </div>
+  </section>
 
-/* Hero 內部內容（系所兩顆按鈕） */
-.hero-inner{
-  position:relative; z-index:2; max-width:1100px; width:100%;
-  padding:0 16px 60px; margin-top:clamp(16px, 2.2vh, 24px);
-}
+  <!-- 贊助廠商 -->
+  <section id="sponsor" class="section">
+    <div class="glass">
+      <h2>贊助廠商</h2>
+      <div class="sponsor-grid">
+        <div class="sponsor">LOGO A</div>
+        <div class="sponsor">LOGO B</div>
+        <div class="sponsor">LOGO C</div>
+        <div class="sponsor">LOGO D</div>
+      </div>
+    </div>
+  </section>
 
-/* 展開探索：固定在主題圖下方（不再用負邊距硬拉） */
-.scroll-btn{
-  position:relative; z-index:2; display:inline-block;
-  margin:clamp(8px, 1.6vh, 18px) auto 0;
-  padding:12px 28px; font-size:18px; font-weight:800; letter-spacing:.02em;
-  color:#e6f0ff; text-decoration:none; border-radius:999px;
-  background:
-    radial-gradient(120px 40px at 20% 50%, rgba(255,255,255,.28), rgba(255,255,255,0) 70%) no-repeat,
-    linear-gradient(90deg, #d8e507, #8ad0ff , #d8e507) 0/200% 100%;
-  border:1px solid rgba(255,255,255,.45); backdrop-filter:blur(6px);
-  box-shadow:0 0 10px rgba(120,220,255,.55), 0 0 20px rgba(120,220,255,.35);
-  transition:transform .18s ease, box-shadow .18s ease, background-position .8s ease;
-  overflow:visible;
-  animation:ribbonShift 4s linear infinite, glowBreath 2.2s ease-in-out infinite;
-}
-.scroll-btn:hover{ transform:translateY(-2px) scale(1.06); box-shadow:0 0 14px #d8e507, 0 0 28px #8ad0ff; background-position:100% 0 }
-.scroll-btn:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(255,255,255,.65), 0 0 24px rgba(160,140,255,.65) }
-.scroll-btn::before{
-  content:""; position:absolute; inset:-12px -16px; border-radius:inherit;
-  background:
-    radial-gradient(60% 120% at 50% -10%, #d8e507, transparent 60%),
-    radial-gradient(80% 60%  at 90% 50%, #8ad0ff , transparent 70%),
-    radial-gradient(70% 80%  at 10% 60%, #d8e507, transparent 70%);
-  filter:blur(10px); opacity:.9; z-index:-1; animation:auroraFloat 6s ease-in-out infinite;
-}
-.scroll-btn::after{
-  content:""; position:absolute; inset:0; border-radius:inherit; padding:1px;
-  background:linear-gradient(90deg, #d8e507,#8ad0ff ,  #d8e507) 0/200% 100%;
-  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor; mask-composite:exclude;
-  animation:borderShift 4s linear infinite;
-}
+  <!-- IG -->
+  <section id="ig" class="section">
+    <div class="glass">
+      <h2>聯展 IG</h2>
+      <div class="ig-wrap">
+        <div class="ig-grid">
+          <div class="ig"></div>
+          <div class="ig"></div>
+          <div class="ig"></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-/* 小螢幕：通常需要再往上一點，把 hero-lift 調高 */
-@media (max-width:860px){ :root{ --hero-lift:12vh } }
-@media (max-width:600px){
-  :root{ --hero-lift:14vh }
-  .title-mark{ max-height: clamp(200px, 32vh, 380px); margin-bottom: clamp(18px, 3vh, 24px) }
-}
+  <footer>
+    © 2025 師大 115級 畢業聯展 — Be Continued × Tech Odyssey
+  </footer>
 
-/* ------------------------------
-   6) 首屏後的內容
---------------------------------*/
-.dept-grid{display:grid; grid-template-columns:repeat(2,minmax(220px,1fr)); gap:18px; max-width:860px; margin:0 auto}
-.dept-img{width:100%; height:auto; display:block}
-.dept-link{display:block; transition:.2s ease}
-.dept-link:hover{transform:translateY(-2px) scale(1.03)}
-.dept-grid .dept-link:nth-child(2){ margin-top:13px }
-
-/* 區塊一般樣式 */
-section{ scroll-margin-top:140px; } /* 平滑捲動時，預留 sticky 導覽列的高度 */
-.section{ max-width:1100px; margin:100px auto; padding:var(--section-pad) 16px; }
-.glass{
-  background:var(--glass-bg); border:1px solid var(--glass-br);
-  border-radius:var(--radius); box-shadow:var(--shadow);
-  backdrop-filter:blur(14px) saturate(130%);
-  padding:28px; color:#e9f3ff;
-}
-.section h2{ margin:0 0 12px; font-family:'Noto Serif TC',serif; font-size:32px }
-.muted{ opacity:.9; margin-top:0 }
-
-/* FAQ */
-.faq{display:grid; gap:12px}
-details{border:1px solid rgba(255,255,255,.35); border-radius:14px; background:rgba(255,255,255,.06)}
-summary{cursor:pointer; padding:16px 18px; font-weight:700}
-details[open]{background:rgba(255,255,255,.10)}
-details .a{padding:0 18px 18px; opacity:.95}
-
-/* 交通資訊 */
-.info-grid{display:grid; grid-template-columns:1.2fr .8fr; gap:18px}
-.kv{display:grid; gap:10px}
-.kv b{font-size:18px}
-.kv div{background:rgba(255,255,255,.06); padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.25)}
-iframe.map{width:100%; height:340px; border:0; border-radius:14px; filter:grayscale(.1) contrast(1.1)}
-
-/* 贊助廠商 */
-.sponsor-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px}
-.sponsor{height:96px; border-radius:14px; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); display:grid; place-items:center; font-weight:800; color:#0b1733; text-shadow:0 1px 0 #fff8}
-
-/* IG */
-.ig-wrap{display:grid; gap:12px}
-.ig-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px}
-.ig{aspect-ratio:1/1; border-radius:14px; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35)}
-
-/* 底部 */
-footer{padding:40px 16px 80px; text-align:center; opacity:.8}
-
-/* RWD 背景縮放（可視需要微調） */
-@media (max-width:1024px){ .bg-fixed{ background-size:120% auto, 120% auto } }
-@media (max-width:768px ){ .bg-fixed{ background-size:120% auto, 150% auto } }
-
-/* ------------------------------
-   7) Sticky 漸層（銜接 Hero → 下一段）
-   full-bleed：鋪滿整個視窗寬，不被 1100px 版心限制
---------------------------------*/
-.section-fade{
-  position:sticky; top:0;
-  height:24vh;
-  margin-top:-24vh;                      /* ⚠️ 與 height 同值，否則會錯位 */
-  width:100vw;
-  margin-left:calc(50% - 50vw);          /* 脫離版心，吃滿整個視窗寬 */
-  margin-right:calc(50% - 50vw);
-  pointer-events:none;
-  z-index:5;
-  background:linear-gradient(180deg,
-    rgba(4,12,28,.90) 0,
-    rgba(4,12,28,.55) 50%,
-    rgba(4,12,28,.25) 80%,
-    rgba(4,12,28,0) 100%);
-  will-change:transform;
-}
-@media (max-width:768px){
-  .section-fade{ height:30vh; margin-top:-30vh; }
-}
-
-/* ------------------------------
-   8) 動畫 Keyframes（保留原設計）
---------------------------------*/
-@keyframes ribbonShift{ 0%{background-position:0% 0} 100%{background-position:200% 0} }
-@keyframes borderShift{ 0%{background-position:0% 0} 100%{background-position:200% 0} }
-@keyframes glowBreath{
-  0%,100%{ box-shadow:0 0 10px rgba(120,220,255,.55), 0 0 20px rgba(120,220,255,.35) }
-  50%{    box-shadow:0 0 16px rgba(160,200,255,.85), 0 0 32px rgba(190,160,255,.55) }
-}
-@keyframes auroraFloat{
-  0%,100%{ transform:translateY(0) scale(1); opacity:.9 }
-  50%{    transform:translateY(2px) scale(1.02); opacity:1 }
-}
-
-/* 無障礙：降低動效時，關掉按鈕動畫 */
-@media (prefers-reduced-motion: reduce){
-  .scroll-btn, .scroll-btn::before, .scroll-btn::after{ animation:none; transition:none; }
-}
-
-/* 1) 上移量調小：別把首屏扣太多，避免內容被擠到中下方 */
-:root{
-  /* 依實測，6~10vh 最穩。你覺得還低就往上加。 */
-  --hero-lift: 8vh;
-}
-
-/* 2) 主題圖：不要再用 max-height 壓縮，以「寬度」做自適應。
-      最小 560px，正常 68vw，上限 1100px。*/
-.title-mark{
-  width: clamp(560px, 68vw, 1100px) !important;
-  height: auto !important;
-  max-height: none !important;     /* 取消上一版的高度上限 */
-  margin: 0 auto clamp(16px, 2.8vh, 28px) !important;
-}
-
-/* 3) 首屏上內距：維持上移但保留安全基準，確保一打開就看得到主題圖。*/
-.hero{
-  padding-top: max(24px,
-                   calc(clamp(72px, 10vh, 120px) - var(--hero-lift))
-                  ) !important;
-  /* 底部留白略縮，讓主體更靠上 */
-  padding-bottom: clamp(32px, 6vh, 80px) !important;
-}
-
-/* 4) 按鈕就跟在主題圖下方，也別再被任何負 margin 影響 */
-.scroll-btn{
-  margin: clamp(10px, 2vh, 20px) auto 0 !important;
-}
-
-/* 5) 手機再微調一次：主題圖稍微放大、上移多一點更耐看 */
-@media (max-width: 600px){
-  :root{ --hero-lift: 10vh; }
-  .title-mark{
-    width: clamp(520px, 82vw, 1100px) !important;
-  }
-    .section-fade{
-      height: 20vh;              /* 比 30vh 再短，重疊時間更少 */
-      margin-top: -20vh;         /* 一定要跟 height 同值 */
-      background: linear-gradient(
-        180deg,
-        rgba(4,12,28,0) 0%,
-        rgba(4,12,28,.25) 20%,
-        rgba(4,12,28,.55) 40%,
-        rgba(4,12,28,.9) 100%
-      );
-    }
-}
-@media (max-width: 900px){
-
-  /* 1) Hero 底部漸層「收斂」：尾端不要那麼黑、拉長過渡 */
-  .hero::after{
-    content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
-    background:linear-gradient(180deg,
-      rgba(4,12,28,0) 0%,
-      rgba(4,12,28,.25) 20%,
-      rgba(4,12,28,.55) 40%,
-      rgba(4,12,28,.9) 100%);
-  }
-
-  /* 2) 下一段的 sticky 淡出：前段先透明、整體更短，
-        並確保 height 與 margin-top 同值，避免錯位 */
-  .section-fade{
-    height: 24vh !important;
-    margin-top: -24vh !important;
-    width: 100vw !important;
-    margin-left: calc(50% - 50vw) !important;
-    margin-right: calc(50% - 50vw) !important;
-    background: linear-gradient(
-      180deg,
-      rgba(4,12,28,.90) 0%,
-        rgba(4,12,28,.55) 50%,
-        rgba(4,12,28,.25) 80%,
-        rgba(4,12,28,0) 100%
-    ) !important;
-  }
-}
-  
-.bg-fixed{
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  pointer-events: none;
-
-  /* 兩層背景：漸層在前、圖片在後 */
-  background-image:
-    linear-gradient(180deg, rgba(11,37,96,0) 0%, rgba(11,37,96,.40) 35%, rgba(11,37,96,.75) 100%),
-    url('img/背景.png');
-
-  /* 尺寸：漸層鋪滿整個視窗；圖片用 cover 以確保滿版且可上下平移 */
-  background-size:
-    100% 100%,          /* 漸層 */
-    cover;              /* 圖片 */
-
-  /* 位置：漸層固定在 top；圖片的 Y 位置用變數 --bg-pos 控制 */
-  background-position:
-    center top,
-    center var(--bg-pos, 0%);
-
-  background-repeat: no-repeat, no-repeat;
-
-  /* 提升滾動時的流暢度 */
-  will-change: background-position;
-}
+  <!-- JS -->
+  <script src="script.js"></script>
+</body>
+</html>
